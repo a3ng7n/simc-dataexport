@@ -13,6 +13,10 @@ local OFFSET_FLAGS = 11
 local OFFSET_BONUS_ID = 13
 local OFFSET_UPGRADE_ID = 14 -- Flags = 0x4
 
+local OFFSET_CONTAINER_ITEMINFO_LINK = 7
+local OFFSET_CONTAINER_ITEMINFO_ID = 10
+local OFFSET_ITEMINFO_EQUIPSLOT = 9
+
 -- Artifact stuff (adapted from LibArtifactData [https://www.wowace.com/addons/libartifactdata-1-0/], thanks!)
 local ArtifactUI          = _G.C_ArtifactUI
 local HasArtifactEquipped = _G.HasArtifactEquipped
@@ -28,6 +32,8 @@ local profNames     = Simulationcraft.ProfNames
 local regionString  = Simulationcraft.RegionString
 local artifactTable = Simulationcraft.ArtifactTable
 
+local slotTypes = Simulationcraft.slotTypes
+
 -- Most of the guts of this addon were based on a variety of other ones, including
 -- Statslog, AskMrRobot, and BonusScanner. And a bunch of hacking around with AceGUI.
 -- Many thanks to the authors of those addons, and to reia for fixing my awful amateur
@@ -35,6 +41,7 @@ local artifactTable = Simulationcraft.ArtifactTable
 
 function Simulationcraft:OnInitialize()
   Simulationcraft:RegisterChatCommand('simc', 'PrintSimcProfile')
+  Simulationcraft:RegisterChatCommand('simctest', 'PrintGearTable')
 end
 
 function Simulationcraft:OnEnable()
@@ -154,6 +161,56 @@ function Simulationcraft:GetArtifactString()
 end
 
 -- =================== Item Information =========================
+
+  -- initialize the gear table
+local gearTable = {}
+for slotTypeNum=1, #slotTypes do
+  gearTable[slotTypes[slotTypeNum]] = {}
+end
+
+function Simulationcraft:GetGearTable()
+  -- Default Bank Slot
+  containerId = -1
+  Simulationcraft:AddContainerToGearTable(containerId)
+  
+  -- Remaining Bank Slots
+  for containerId=NUM_BAG_SLOTS+1, NUM_BAG_SLOTS+NUM_BANKBAGSLOTS do
+    Simulationcraft:AddContainerToGearTable(containerId)
+  end
+
+  -- All Bag Slots
+  for containerId=0, NUM_BAG_SLOTS do
+    Simulationcraft:AddContainerToGearTable(containerId)
+  end
+
+  return gearTable
+end
+
+function Simulationcraft:AddContainerToGearTable(containerId)
+  for slotNum=1, GetContainerNumSlots(containerId) do
+    local containerItemInfo = {GetContainerItemInfo(containerId, slotNum)}
+    local itemLink = containerItemInfo[OFFSET_CONTAINER_ITEMINFO_LINK]
+
+    if containerItemInfo[OFFSET_CONTAINER_ITEMINFO_ID] then
+      local itemInfo = {GetItemInfo(containerItemInfo[OFFSET_CONTAINER_ITEMINFO_ID])}
+      local itemEquipSlot = itemInfo[OFFSET_ITEMINFO_EQUIPSLOT]
+      table.insert(gearTable[itemEquipSlot],1,itemLink)
+    end
+  end
+end
+
+  -- BAG ITEMS
+  -- for containerID=BACKPACK_CONTAINER, NUM_BAG_SLOTS
+
+function Simulationcraft:PrintGearTable()
+  local gear = Simulationcraft:GetGearTable()
+  for slotTypeNum=1, #slotTypes do
+    for k, v in pairs(gear[slotTypes[slotTypeNum]]) do
+      print(slotTypes[slotTypeNum], k, v)
+    end
+  end
+end
+
 
 function Simulationcraft:GetItemStrings()
   local items = {}
@@ -374,4 +431,5 @@ function Simulationcraft:PrintSimcProfile()
   SimcCopyFrameScrollText:Show()
   SimcCopyFrameScrollText:SetText(simulationcraftProfile)
   SimcCopyFrameScrollText:HighlightText()
+  print(Simulationcraft:GetGearTable())
 end

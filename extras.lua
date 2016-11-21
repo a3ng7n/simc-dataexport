@@ -132,10 +132,46 @@ Simulationcraft.SpecNames = {
   [73] = 'Protection'
 }
 
+Simulationcraft.slotTypes = {"" , "INVTYPE_AMMO", "INVTYPE_HEAD", "INVTYPE_NECK", "INVTYPE_SHOULDER", "INVTYPE_BODY", "INVTYPE_CHEST", "INVTYPE_ROBE", "INVTYPE_WAIST", "INVTYPE_LEGS", "INVTYPE_FEET", "INVTYPE_WRIST", "INVTYPE_HAND", "INVTYPE_FINGER", "INVTYPE_TRINKET", "INVTYPE_CLOAK", "INVTYPE_WEAPON", "INVTYPE_SHIELD", "INVTYPE_2HWEAPON", "INVTYPE_WEAPONMAINHAND", "INVTYPE_WEAPONOFFHAND", "INVTYPE_HOLDABLE", "INVTYPE_RANGED", "INVTYPE_THROWN", "INVTYPE_RANGEDRIGHT", "INVTYPE_RELIC", "INVTYPE_TABARD", "INVTYPE_BAG", "INVTYPE_QUIVER"};
+
 -- slot name conversion stuff
 
 Simulationcraft.slotNames = {"HeadSlot", "NeckSlot", "ShoulderSlot", "BackSlot", "ChestSlot", "ShirtSlot", "TabardSlot", "WristSlot", "HandsSlot", "WaistSlot", "LegsSlot", "FeetSlot", "Finger0Slot", "Finger1Slot", "Trinket0Slot", "Trinket1Slot", "MainHandSlot", "SecondaryHandSlot", "AmmoSlot" };    
 Simulationcraft.simcSlotNames = {'head','neck','shoulder','back','chest','shirt','tabard','wrist','hands','waist','legs','feet','finger1','finger2','trinket1','trinket2','main_hand','off_hand','ammo'}
+
+-- 0 = ammo
+-- 1 = head
+-- 2 = neck
+-- 3 = shoulder
+-- 4 = shirt
+-- 5 = chest
+-- 6 = waist
+-- 7 = legs
+-- 8 = feet
+-- 9 = wrist
+-- 10 = hands
+-- 11 = finger 1
+-- 12 = finger 2
+-- 13 = trinket 1
+-- 14 = trinket 2
+-- 15 = back
+-- 16 = main hand
+-- 17 = off hand
+-- 18 = ranged
+-- 19 = tabard
+-- 20 = first bag (the rightmost one)
+-- 21 = second bag
+-- 22 = third bag
+-- 23 = fourth bag (the leftmost one)
+-- When bank frame is open Edit
+-- 40 to 67 = the 28 bank slots
+-- 68 = first bank bag slot
+-- 69 = second bank bag slot
+-- 70 = third bank bag slot
+-- 71 = fourth bank bag slot
+-- 72 = fifth bank bag slot
+-- 73 = sixth bank bag slot
+-- 74 = seventh bank bag slot
 
 -- table for conversion to upgrade level, stolen from AMR (<3)
 
