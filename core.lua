@@ -168,22 +168,38 @@ for slotTypeNum=1, #slotTypes do
   gearTable[slotTypes[slotTypeNum]] = {}
 end
 
+local gearCombo = {}
+
 function Simulationcraft:GetGearTable()
   -- Default Bank Slot
   containerId = -1
+  print("Adding default bank slot")
   Simulationcraft:AddContainerToGearTable(containerId)
   
   -- Remaining Bank Slots
   for containerId=NUM_BAG_SLOTS+1, NUM_BAG_SLOTS+NUM_BANKBAGSLOTS do
+    print("Adding default bank slot "..containerId)
     Simulationcraft:AddContainerToGearTable(containerId)
   end
 
   -- All Bag Slots
   for containerId=0, NUM_BAG_SLOTS do
+    print("Adding default bag slot "..containerId)
     Simulationcraft:AddContainerToGearTable(containerId)
   end
-
+  print("Adding character gear")
   Simulationcraft:AddCharacterToGearTable()
+
+  for slotNum=1, #slotNames do
+    local slotId = GetInventorySlotInfo(slotNames[slotNum])
+
+    if gearTable then
+      print("found a gearcombo")
+      local itemLink = gearTable[slotNum]
+    end
+
+    print(itemLink)
+  end
 
   return gearTable
 end
@@ -205,10 +221,13 @@ function Simulationcraft:AddCharacterToGearTable()
   for slotNum=1, #slotNames do
     local slotId = GetInventorySlotInfo(slotNames[slotNum])
     local itemLink = GetInventoryItemLink('player', slotId)
+    print("Adding slot name: "..slotNames[slotNum])
     
     if itemLink then
       local itemInfo = {GetItemInfo(GetInventoryItemID('player', slotId))}
+      print(itemInfo)
       local itemEquipSlot = itemInfo[OFFSET_ITEMINFO_EQUIPSLOT]
+      print("Adding slot # "..itemEquipSlot)
       table.insert(gearTable[itemEquipSlot],1,itemLink)
     end
   end
@@ -230,10 +249,13 @@ function Simulationcraft:GetItemStrings(someGearCombo)
     local slotId = GetInventorySlotInfo(slotNames[slotNum])
 
     if someGearCombo then
+      print("found a gearcombo")
       local itemLink = someGearCombo[slotNum]
     else
       local itemLink = GetInventoryItemLink('player', slotId)
     end
+
+    print(itemLink)
 
     -- if we don't have an item link, we don't care
     if itemLink then
@@ -429,8 +451,6 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
 
   local header = simulationcraftProfile
 
-  local gearCombo = {}
-
   local alltext = ""
 
   local someGearTable = Simulationcraft:GetGearTable()
@@ -439,34 +459,48 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
   gearCombo[16] = GetInventoryItemLink('player', GetInventorySlotInfo('SecondaryHandSlot'))
 
   for _, helm in pairs(someGearTable["INVTYPE_HEAD"]) do
+    print("iterating helm: "..helm)
 
     for _, neck in pairs(someGearTable["INVTYPE_NECK"]) do
+      print("iterating neck: "..neck)
 
       for _, shoulder in pairs(someGearTable["INVTYPE_SHOULDER"]) do
+        print("iterating shoulder: "..shoulder)
 
         for _, back in pairs(someGearTable["INVTYPE_CLOAK"]) do
+          print("iterating back: "..back)
 
-          for _, chest in pairs(someGearTable["INVTYPE_BODY"]) do
+          for _, chest in pairs(someGearTable["INVTYPE_CHEST"]) do
+            print("iterating chest: "..chest)
 
             for _, wrist in pairs(someGearTable["INVTYPE_WRIST"]) do
+              print("iterating wrist: "..wrist)
 
               for _, hands in pairs(someGearTable["INVTYPE_HAND"]) do
+                print("iterating hands: "..hands)
 
                 for _, belt in pairs(someGearTable["INVTYPE_WAIST"]) do
+                  print("iterating belt: "..belt)
 
                   for _, legs in pairs(someGearTable["INVTYPE_LEGS"]) do
+                    print("iterating legs: "..legs)
 
                     for _, feet in pairs(someGearTable["INVTYPE_FEET"]) do
+                      print("iterating feet: "..feet)
 
                       -- handle two different rings
                       for ri, ring1 in pairs(someGearTable["INVTYPE_FINGER"]) do
                         for ri2=ri+1, #someGearTable["INVTYPE_FINGER"] do
                           ring2 = someGearTable["INVTYPE_FINGER"][ri2]
+                          print("iterating ring1: "..ring1)
+                          print("iterating ring2: "..ring2)
 
                           -- handle two different trinkets
                           for ti, trinket1 in pairs(someGearTable["INVTYPE_TRINKET"]) do
                             for ti2=ti+1, #someGearTable["INVTYPE_TRINKET"] do
                               trinket2 = someGearTable["INVTYPE_TRINKET"][ti2]
+                              print("iterating trinket1: "..trinket1)
+                              print("iterating trinket2: "..trinket2)
 
                               gearCombo[0] = helm
                               gearCombo[1] = neck
@@ -479,7 +513,7 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
                               gearCombo[7] = wrist
                               gearCombo[8] = hands
                               gearCombo[9] = belt
-                              gearCombo[10] = legs
+                              gearCombo[10] = legsw
                               gearCombo[11] = ring1
                               gearCombo[12] = ring2
                               gearCombo[13] = trinket1
@@ -487,18 +521,36 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
                               -- IGNORING AMMO SLOT?
                               gearCombo[17] = nil
 
+                              for i=0, 17 do
+                                print(gearCombo[i])
+                              end
+
                               -- Method that gets gear information
                               local items = Simulationcraft:GetItemStrings(gearCombo)
+                              print(items)
                               local gearBody = ""
 
                               -- output gear
                               for slotNum=1, #slotNames do
                                 if items[slotNum] then
+                                  print(items[slotNum])
                                   gearBody = gearBody .. items[slotNum] .. '\n'
                                 end
                               end
 
                               alltext = alltext .. header .. gearBody
+                              -- sanity checks - if there's anything that makes the output completely invalid, punt!
+                              if specId==nil then
+                                simulationcraftProfile = "Error: You need to pick a spec!"
+                              end
+
+                              -- show the appropriate frames
+                              SimcCopyFrame:Show()
+                              SimcCopyFrameScroll:Show()
+                              SimcCopyFrameScrollText:Show()
+                              SimcCopyFrameScrollText:SetText(alltext)
+                              SimcCopyFrameScrollText:HighlightText()
+                              return
                             end
                           end
                         end
@@ -514,16 +566,4 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
     end
   end
 
-  -- sanity checks - if there's anything that makes the output completely invalid, punt!
-  if specId==nil then
-    simulationcraftProfile = "Error: You need to pick a spec!"
-  end
-
-  -- show the appropriate frames
-  SimcCopyFrame:Show()
-  SimcCopyFrameScroll:Show()
-  SimcCopyFrameScrollText:Show()
-  SimcCopyFrameScrollText:SetText(alltext)
-  SimcCopyFrameScrollText:HighlightText()
-  print(Simulationcraft:GetGearTable())
 end
