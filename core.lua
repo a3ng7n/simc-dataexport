@@ -249,10 +249,11 @@ function Simulationcraft:GetItemStrings(someGearCombo)
     local slotId = GetInventorySlotInfo(slotNames[slotNum])
 
     if someGearCombo then
-      print("found a gearcombo")
-      local itemLink = someGearCombo[slotNum]
+      print(someGearCombo[slotNum])
+      itemLink = someGearCombo[slotNum]
+      print("checking slot: "..slotNum)
     else
-      local itemLink = GetInventoryItemLink('player', slotId)
+      itemLink = GetInventoryItemLink('player', slotId)
     end
 
     print(itemLink)
@@ -452,11 +453,15 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
   local header = simulationcraftProfile
 
   local alltext = ""
+  SimcCopyFrame:Show()
+  SimcCopyFrameScroll:Show()
+  SimcCopyFrameScrollText:Show()
+  SimcCopyFrameScrollText:SetText(alltext)
 
   local someGearTable = Simulationcraft:GetGearTable()
 
-  gearCombo[15] = GetInventoryItemLink('player', GetInventorySlotInfo('MainHandSlot'))
-  gearCombo[16] = GetInventoryItemLink('player', GetInventorySlotInfo('SecondaryHandSlot'))
+  gearCombo[17] = GetInventoryItemLink('player', GetInventorySlotInfo('MainHandSlot'))
+  gearCombo[18] = GetInventoryItemLink('player', GetInventorySlotInfo('SecondaryHandSlot'))
 
   for _, helm in pairs(someGearTable["INVTYPE_HEAD"]) do
     print("iterating helm: "..helm)
@@ -502,26 +507,28 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
                               print("iterating trinket1: "..trinket1)
                               print("iterating trinket2: "..trinket2)
 
-                              gearCombo[0] = helm
-                              gearCombo[1] = neck
-                              gearCombo[2] = shoulder
-                              gearCombo[3] = back
-                              gearCombo[4] = chest
+                              gearCombo[1] = helm
+                              gearCombo[2] = neck
+                              gearCombo[3] = shoulder
+                              gearCombo[4] = back
+                              gearCombo[5] = chest
                               -- IGNORING TABARDS AND SHIRTS?
-                              gearCombo[5] = nil
                               gearCombo[6] = nil
-                              gearCombo[7] = wrist
-                              gearCombo[8] = hands
-                              gearCombo[9] = belt
-                              gearCombo[10] = legsw
-                              gearCombo[11] = ring1
-                              gearCombo[12] = ring2
-                              gearCombo[13] = trinket1
-                              gearCombo[14] = trinket2
+                              gearCombo[7] = nil
+                              gearCombo[8] = wrist
+                              gearCombo[9] = hands
+                              gearCombo[10] = belt
+                              gearCombo[11] = legs
+                              gearCombo[12] = feet
+                              gearCombo[13] = ring1
+                              gearCombo[14] = ring2
+                              gearCombo[15] = trinket1
+                              gearCombo[16] = trinket2
                               -- IGNORING AMMO SLOT?
-                              gearCombo[17] = nil
+                              gearCombo[19] = nil
 
-                              for i=0, 17 do
+                              for i=1, 19 do
+                                print("checking slot: "..i)
                                 print(gearCombo[i])
                               end
 
@@ -530,29 +537,20 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
                               print(items)
                               local gearBody = ""
 
+                              gearBody = gearBody .. playerArtifact .. ' '
+
                               -- output gear
                               for slotNum=1, #slotNames do
                                 if items[slotNum] then
                                   print(items[slotNum])
-                                  gearBody = gearBody .. items[slotNum] .. '\n'
+                                  gearBody = gearBody .. items[slotNum] .. ' '
                                 end
                               end
-
-                              alltext = alltext .. header .. gearBody
-                              -- sanity checks - if there's anything that makes the output completely invalid, punt!
-                              if specId==nil then
-                                simulationcraftProfile = "Error: You need to pick a spec!"
-                              end
-
-                              -- show the appropriate frames
-                              SimcCopyFrame:Show()
-                              SimcCopyFrameScroll:Show()
-                              SimcCopyFrameScrollText:Show()
+                              alltext = alltext .. gearBody .. "\n"
                               SimcCopyFrameScrollText:SetText(alltext)
-                              SimcCopyFrameScrollText:HighlightText()
-                              return
                             end
                           end
+                          return
                         end
                       end
                     end
@@ -565,5 +563,14 @@ function Simulationcraft:PrintSimcProfile(someGearCombo)
       end
     end
   end
+  alltext = alltext .. header .. gearBody
+  -- sanity checks - if there's anything that makes the output completely invalid, punt!
+  if specId==nil then
+    simulationcraftProfile = "Error: You need to pick a spec!"
+  end
 
+  -- show the appropriate frames
+
+  SimcCopyFrameScrollText:HighlightText()
+  return
 end
